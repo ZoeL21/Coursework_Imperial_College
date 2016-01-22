@@ -1,0 +1,1 @@
+No starting position for rotor 0 in rotor position file: rotor.pos

@@ -1,0 +1,1 @@
+Non-numeric character for mapping in rotor file rotor.rot
