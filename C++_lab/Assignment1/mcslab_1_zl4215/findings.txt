@@ -1,0 +1,128 @@
+Answer to Question 5:
+
+From the results of the function 'solve_board' one can see that the
+board 'mystery2' is unsolvable.
+
+Several approaches were used to determine which of the mystery sudoku
+boards is hard and extermely hard. In a first approach, the amount of
+recursive calls made by the function 'solve_board', as well as the
+calls to the function 'make_move' were counted, using the global variables
+'solve_count' and 'make_move_count' inside the sudoku.cpp file as well
+as two accessing functions 'get_solve_count' and 'get_make_move_count'
+through which the values of the variables can be accessed from the
+main function. Two functions 'solve_board_count_increase' and
+make_move_count_increase' were used to increase the variables at each 
+call of 'solve_board' and 'make_move'.
+A resetting function 'reset_counts' was used to reset
+the variables to zero from the main function after a sudoku board is
+solved. The reasoning behind this approach was such, that a more
+difficult sudokuboard would be more likely to require more recursive 
+backtracking, as more moves in each cell are 
+possible and the program would guess wrongly more often. 
+
+In addition to counting the function calls, the time taken for solving 
+each board was measured using the std::chrono library, setting
+time_points before and after the function calls inside the
+main function. Furthermore, the amount of initial digits inside each
+board was counted using the function 'count_numbers', as this also
+reflects the difficulty of each board.
+
+The value of the counting variables, as well as the time and the count
+of the initial digits was read into a struct info_board of type info,
+containing arrays to hold the information for each one of the sudoku
+boards. The struct info was declared inside the header and its
+instance 'info_board' was initialised in the main function. A function
+'display_info' was written, which takes the struct as an argument and
+displays its content as a table, which can be seen from TABLE 1.
+
+The results shown inside TABLE 1 are consistent as the board mystery1 has least
+initial digits and takes more time to be solved than the other
+boards. It also requires more recursive calls and calls to the
+function 'make_move'. From this it can be concluded that board
+mystery3 is of hard difficulty and board mystery 1 is of exremely hard difficulty.
+
+ |==============================================================================|
+ |board name:            | easy   |  medium  | mystery1   | mystery2 | mystery3 |
+ |initial digits:        | 26     | 25       | 23         | 24       | 24       |
+ |timetosolve(micros.):  | 13168  | 122545   | 2919389    | 0        | 43054    |  
+ |solve_count:           | 73013  | 636930   | 16139461   | 0        | 273453   |
+ |make_move_count:       | 21453  | 156348   | 4215175    | 0        | 141030   |
+ |==============================================================================|
+ TABLE 1.
+
+However, this is not a fully reliable result, as the 'solve_board'
+function iterates through the numbers 1 to 9 for each cell, taking the
+first move allowed. As a consequence, if the numbers which are
+actually correct tend to lie in the higher range, for example between 6 and 9,
+the program would have to do more recursive backtracking and appear to
+be more difficult, than if the direction of iteration would be
+reversed from 9 to 1. This was therefore tried and the results can be
+seen in TABLE 2.
+
+
+ |==============================================================================| 
+ |board name:          | easy   |  medium  | mystery1  | mystery2  | mystery3   |
+ |initial digits:      | 26     | 25       | 23        | 24        | 24         | 
+ |timetosolve(micros.):| 6948   | 37795    | 50522     | 0         | 44373      |
+ |solve_count:         | 52790  | 424345   | 630378    | 0         | 548637     |
+ |make_move_count:     | 15702  | 100778   | 164293    | 0         | 164377     | 
+ |==============================================================================| 
+  TABLE 2.
+
+Even though these results do not contradict the ones in TABLE 1 and
+board mystery1 still takes the longest to solve and makes most
+recursive calls, its lead has been decreased dramatically. Meanwhile
+the difficulty of board mystery3 seems to have increased. This shows
+that the analysis using recursive calls and time is not very precise.
+
+As a variation of this approach, instead of the recursive calls, it
+was counted how often the 'solve_board' function returns false as a
+result of iterating through all the digits for a cell, none of them
+returning true for 'solve_board'. To do this, the call of the function
+'increase_solve_count' was placed after the 'for-loop' iterating
+through the digits 1 to 9 inside 'solve_board'. In this manner, the false guesses are
+counted. The results for iterating from 1 to 9 and backwards can be
+seen in TABLES 3 and 4 respecticely.
+
+ |==============================================================================|
+ |board name:          | easy   |  medium  | mystery1  | mystery2  | mystery3   |
+ |initial digits:      | 26     | 25       | 23        | 24        | 24         |
+ |timetosolve(micros.):| 23107  | 195174   | 3065412   | 0         | 43068      |
+ |error_count:         | 2116   | 15605    | 421488    | 0         | 14076      |
+ |make_move_count:     | 21453  | 156348   | 4215175   | 0         | 141030     |
+ |==============================================================================|
+ TABLE 3: 
+
+ |==============================================================================|
+ |board name:          | easy    |  medium  | mystery1 | mystery2  | mystery3   |
+ |initial digits:      | 26      | 25       | 23       | 24        | 24         | 
+ |timetosolve(micros.):| 12662   | 119792   | 155207   | 0         | 140650     |
+ |error_count:         | 3133    | 20148    | 32849    | 0         | 32861      |
+ |make_move_count:     | 15702   | 100778   | 164293   | 0         | 164377     |  
+ |==============================================================================|
+ TABLE 4: 
+
+The results shown in TABLE 3 still clearly support the conclusion, that
+the board 'mystery1' is the hardest. However, when iterating
+backwards, it can be seen from TABLE 4, that solve_count guesses
+wronlgy 12 times more solving board 'mystery3' than solving
+board 'mystery1' and 'make_move' is also called more often for the
+apparently easier board 'mystery3', while the time to solve still
+remains longest for 'mystery1'. The reason for this could be due to
+the fact, that board mystery1 does have to check one more digit than board mystery3. 
+
+To use these parameters to reliably determine the difficulty of each board, one
+could randomly generate the numbers through which the function
+'solve_board' iterates to find the first for which 'make_move' returns
+true. One would then take several runs for each board and compute the
+averages of the time taken and the calls of make_move and
+solve_count. 
+
+Other approaches to determine the difficulty could include determining
+the distribution of initial numbers i.e. how many instances of each
+number are given (easy boards generally have each digit from 1 to 9
+occur several times) and their distribution across the board.
+
+Overall, it was concluded, that the difficult board is mystery3 and
+the extremely difficult board is mystery1. The unsolvable board
+remains mystery2.

@@ -1,0 +1,34 @@
+forall(C1,C2) :- \+ (C1, \+ C2).
+
+in_range(Min,Max,N):-
+    N < Min.
+in_range(Min,Max,N):-
+ N >= Max.
+
+empty_cell(N):-
+    cell(N),
+    forall(prisoners(F,S,Cn,C,S,Ts),N\=Cn).
+
+all_female_cell(N):-
+    cell(N),
+    forall(prisoners(Fn,Sn,N,C,S,Ts),female_name(Fn)).
+
+female_priisoners(N):-
+    setof(Fn,(prisoner(Fn,Sn,Cn,C,S,Ts),female_name(Fn)),L),length(L,N).
+
+occupancy(Cell,N):-
+    setof(X,prisoner(X,Sn,Cell,C,S,Ts),L),length(L,N).
+
+fullest_Cell(Cell):-
+    cell(Cell),occupancy(Cell,N),
+    forall((cell(Cell2)),(occupancy(Cell2,N1),N1 < N)).
+
+worst_psychopath(S,F,Crime,T):-
+    psychopath(S,F),
+    prisoner(F,S,Cn,Crime,T,Ts),
+    \+ (prisoner(Fx,Sx,Cnx,Crime,Tx,Tsx),
+	psychopath(Sx,Fx),Tx > T).
+
+criminals(Crime,N):-
+    crimes(C),
+    member(Crime,C),
